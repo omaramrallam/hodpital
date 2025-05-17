@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصفحة الرئيسية - نظام المتابعة الصحية</title>
+   
+    <style>
+        body {
+            font-family: 'Tajawal', 'Tahoma', sans-serif;
+            background-color: #e6f2ff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(183, 28, 28, 0.2);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            color: #b71c1c;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background-color: #b71c1c;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            margin: 15px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 80%;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #8e0000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        /* نافذة منبثقة للرمز */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            display: block;
+        }
+
+        /* نافذة الدفع */
+        #paymentModal .modal-content {
+            max-width: 500px;
+        }
+
+        .payment-methods {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .payment-method {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method:hover {
+            border-color: #b71c1c;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .payment-method img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+
+        .payment-method.selected {
+            border-color: #b71c1c;
+            background-color: #ffebee;
+        }
+
+        /* فورم بيانات البطاقة */
+        .card-form {
+            display: none;
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .card-form label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        .card-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .card-row div {
+            width: 48%;
+        }
+
+        /* كود الدخول */
+        .access-code {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 18px;
+            margin: 20px 0;
+            word-break: break-all;
+            direction: ltr;
+            text-align: center;
+        }
+
+        .copy-btn {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .success-msg {
+            color: #4caf50;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .error-msg {
+            color: #f44336;
+            margin: 10px 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>مرحبًا بك في نظام المتابعة الصحية</h1>
+        <button onclick="openModal('doctorModal')">الدخول كـ طبيب</button>
+        <button onclick="openModal('patientModal')">الدخول كـ مريض</button>
+    </div>
+
+    <!-- نافذة رمز الطبيب -->
+    <div id="doctorModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('doctorModal')">&times;</span>
+            <h2>دخول الطبيب</h2>
+            <input type="password" id="doctorCode" placeholder="أدخل رمز الطبيب" maxlength="4">
+            <p id="doctorError" class="error-msg">رمز الطبيب غير صحيح!</p>
+            <button onclick="verifyDoctorCode()">دخول</button>
+        </div>
+    </div>
+
+    <!-- نافذة رمز المريض -->
+    <div id="patientModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('patientModal')">&times;</span>
+            <h2>دخول المريض</h2>
+            <p>لديك رمز دخول؟</p>
+            <button onclick="showPatientCodeInput()">نعم، لدي رمز</button>
+            <button onclick="showPaymentModal()">لا، أريد إنشاء حساب جديد</button>
+            <div id="codeInputSection" style="display: none; margin-top: 20px;">
+                <input type="text" id="patientCode" placeholder="أدخل رمز الدخول المكون من 24 رقم" maxlength="24">
+                <p id="patientError" class="error-msg">رمز الدخول غير صحيح!</p>
+                <button onclick="verifyPatientCode()">تحقق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الدفع -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('paymentModal')">&times;</span>
+            <h2>اختر طريقة الدفع</h2>
+            
+            <div class="payment-methods">
+                <div class="payment-method" onclick="selectPaymentMethod('visa')">
+                    <img src="33.jpg" alt="فيزا">
+                    <span>فيزا</span>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('mastercard')">
+                    <img src="22.jpg" alt="انستا باي">
+                    <span>ماستركارد</span>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('mada')">
+                    <img src="/api/placeholder/60/60" alt="مدى">
+                    <span>مدى</span>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('applepay')">
+                    <img src="/api/placeholder/60/60" alt="آبل باي">
+                    <span>آبل باي</span>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('cash')">
+                    <img src="/api/placeholder/60/60" alt="نقدي">
+                    <span>نقدي</span>
+                </div>
+            </div>
+            
+            <!-- نموذج بيانات البطاقة -->
+            <div id="cardForm" class="card-form">
+                <h3>بيانات البطاقة</h3>
+                <label for="cardNumber">رقم البطاقة</label>
+                <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
+                
+                <label for="cardName">الاسم على البطاقة</label>
+                <input type="text" id="cardName" placeholder="الاسم كما يظهر على البطاقة">
+                
+                <div class="card-row">
+                    <div>
+                        <label for="expiryDate">تاريخ الانتهاء</label>
+                        <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5">
+                    </div>
+                    <div>
+                        <label for="cvv">رمز CVV</label>
+                        <input type="password" id="cvv" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+            </div>
+            
+            <button id="processPaymentBtn" onclick="processPayment()" style="margin-top: 20px;">إتمام الدفع</button>
+            
+            <!-- قسم رمز الدخول -->
+            <div id="accessCodeSection" style="display: none;">
+                <h3>تم إنشاء رمز الدخول الخاص بك</h3>
+                <p>احتفظ بهذا الرمز، ستحتاجه للدخول إلى حسابك:</p>
+                <div id="accessCode" class="access-code"></div>
+                <button class="copy-btn" onclick="copyAccessCode()">نسخ الرمز</button>
+                <p id="copySuccess" class="success-msg">تم نسخ الرمز بنجاح!</p>
+                <button onclick="continueToPatientPage()">الدخول إلى صفحة المريض</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // المتغيرات العامة
+        const DOCTOR_CODE = "doo1";
+        let selectedPaymentMethod = null;
+        let currentAccessCode = null;
+        
+        // رموز الدخول المخزنة
+        let storedAccessCodes = JSON.parse(localStorage.getItem('accessCodes')) || [];
+        
+        // فتح النافذة المنبثقة
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "flex";
+        }
+        
+        // إغلاق النافذة المنبثقة
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+            
+            // إعادة تعيين النماذج
+            if (modalId === 'paymentModal') {
+                document.getElementById('cardForm').style.display = 'none';
+                document.getElementById('accessCodeSection').style.display = 'none';
+                document.getElementById('processPaymentBtn').style.display = 'block';
+                
+                const paymentMethods = document.querySelectorAll('.payment-method');
+                paymentMethods.forEach(method => {
+                    method.classList.remove('selected');
+                });
+                
+                selectedPaymentMethod = null;
+            }
+        }
+        
+        // التحقق من رمز الطبيب
+        function verifyDoctorCode() {
+            const code = document.getElementById('doctorCode').value;
+            const errorElement = document.getElementById('doctorError');
+            
+            if (code === DOCTOR_CODE) {
+                window.location.href = 'index_doctor.html';
+            } else {
+                errorElement.style.display = 'block';
+                setTimeout(() => {
+                    errorElement.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // عرض قسم إدخال رمز المريض
+        function showPatientCodeInput() {
+            document.getElementById('codeInputSection').style.display = 'block';
+        }
+        
+        // عرض نافذة الدفع
+        function showPaymentModal() {
+            closeModal('patientModal');
+            openModal('paymentModal');
+        }
+        
+        // التحقق من رمز المريض
+        function verifyPatientCode() {
+            const code = document.getElementById('patientCode').value;
+            const errorElement = document.getElementById('patientError');
+            
+            // التحقق من قاعدة البيانات المحلية للرموز
+            if (storedAccessCodes.includes(code) && code.length === 24) {
+                window.location.href = 'index_patient.html';
+            } else {
+                errorElement.style.display = 'block';
+                setTimeout(() => {
+                    errorElement.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // اختيار طريقة الدفع
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            paymentMethods.forEach(m => {
+                m.classList.remove('selected');
+            });
+            
+            // تحديد الطريقة المختارة
+            const selectedElement = document.querySelector(payment-methodnth-child({getMethodIndexmethod}));
+            if (selectedElement) {
+                selectedElement.classList.add('selected');
+            }
+            
+            // إظهار/إخفاء نموذج البطاقة
+            if (method === 'visa' || method === 'mastercard' || method === 'mada') {
+                document.getElementById('cardForm').style.display = 'block';
+            } else {
+                document.getElementById('cardForm').style.display = 'none';
+            }
+        }
+        
+        // الحصول على مؤشر طريقة الدفع
+        function getMethodIndex(method) {
+            const methods = ['visa', 'mastercard', 'mada', 'applepay', 'cash'];
+            return methods.indexOf(method) + 1;
+        }
+        
+        // معالجة الدفع
+        function processPayment() {
+            if (!selectedPaymentMethod) {
+                alert('الرجاء اختيار طريقة دفع');
+                return;
+            }
+            
+            // التحقق من بيانات البطاقة إذا كانت تتطلب ذلك
+            if ((selectedPaymentMethod === 'visa' || selectedPaymentMethod === 'mastercard' || selectedPaymentMethod === 'mada') && 
+                !validateCardDetails()) {
+                return;
+            }
+            
+            // إنشاء رمز دخول جديد
+            currentAccessCode = generateAccessCode();
+            
+            // حفظ الرمز في التخزين المحلي
+            storeAccessCode(currentAccessCode);
+            
+            // إظهار الرمز للمستخدم
+            document.getElementById('accessCode').textContent = currentAccessCode;
+            document.getElementById('processPaymentBtn').style.display = 'none';
+            document.getElementById('accessCodeSection').style.display = 'block';
+        }
+        
+        // التحقق من صحة بيانات البطاقة
+        function validateCardDetails() {
+            const cardNumber = document.getElementById('cardNumber').value;
+            const cardName = document.getElementById('cardName').value;
+            const expiryDate = document.getElementById('expiryDate').value;
+            const cvv = document.getElementById('cvv').value;
+            
+            // تحقق بسيط من البيانات
+            if (!cardNumber || cardNumber.replace(/\s/g, '').length < 16) {
+                alert('الرجاء إدخال رقم بطاقة صحيح');
+                return false;
+            }
+            
+            if (!cardName || cardName.length < 3) {
+                alert('الرجاء إدخال اسم صحيح');
+                return false;
+            }
+            
+            if (!expiryDate || expiryDate.length < 5 || !expiryDate.includes('/')) {
+                alert('الرجاء إدخال تاريخ انتهاء صحيح (MM/YY)');
+                return false;
+            }
+            
+            if (!cvv || cvv.length < 3) {
+                alert('الرجاء إدخال رمز CVV صحيح');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // إنشاء رمز دخول عشوائي
+        function generateAccessCode() {
+            let code = "";
+            for (let i = 0; i < 24; i++) {
+                code += Math.floor(Math.random() * 10);
+            }
+            return code;
+        }
+        
+        // تخزين رمز الدخول
+        function storeAccessCode(code) {
+            storedAccessCodes.push(code);
+            localStorage.setItem('accessCodes', JSON.stringify(storedAccessCodes));
+        }
+        
+        // نسخ رمز الدخول
+        function copyAccessCode() {
+            const codeText = document.getElementById('accessCode').textContent;
+            navigator.clipboard.writeText(codeText).then(() => {
+                const successElement = document.getElementById('copySuccess');
+                successElement.style.display = 'block';
+                
+                setTimeout(() => {
+                    successElement.style.display = 'none';
+                }, 3000);
+            });
+        }
+        
+        // الانتقال إلى صفحة المريض
+        function continueToPatientPage() {
+            // تخزين الرمز الحالي في الجلسة للتحقق السريع
+            sessionStorage.setItem('currentAccessCode', currentAccessCode);
+            window.location.href = 'index_patient.html';
+        }
+        
+        // تنسيق رقم البطاقة أثناء الكتابة
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            let formattedValue = '';
+            
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formattedValue += ' ';
+                }
+                formattedValue += value[i];
+            }
+            
+            e.target.value = formattedValue;
+        });
+        
+        // تنسيق تاريخ الانتهاء
+        document.getElementById('expiryDate').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            }
+            
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

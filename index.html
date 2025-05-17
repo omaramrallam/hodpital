@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> مجال الصحة - الرعاية الصحية العالم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        
+        box-sizing: border-box;
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: transparent;
+            color: #333;
+            direction: rtl;
+            overflow-x: hidden;
+            position: relative;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+
+        body::before {
+            display: none;
+        }
+
+        .background-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            filter: brightness(0.8);
+            transition: transform 0.1s ease;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(211, 47, 47, 0.4));
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            animation: headerSlideIn 1.5s ease-out;
+            transition: padding 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.dark-mode .header {
+            background: #2c2c2c;
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            height: 50px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            animation: logoPulse 1s ease-in-out;
+        }
+
+        .desktop-nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        .desktop-nav ul li {
+            margin-left: 30px;
+        }
+
+        .desktop-nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
+            position: relative;
+            padding-bottom: 5px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .desktop-nav ul li a {
+            color: #e0e0e0;
+        }
+
+        .desktop-nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #d32f2f;
+            transition: width 0.3s ease;
+        }
+
+        .desktop-nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        .desktop-nav ul li a:hover {
+            color: #d32f2f;
+        }
+
+        .desktop-nav ul li a.login-btn {
+            background: #d32f2f;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 25px;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .desktop-nav ul li a.login-btn:hover {
+            background: #b71c1c;
+            transform: translateY(-2px);
+        }
+
+        .hamburger {
+            display: block;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333;
+        }
+
+        body.dark-mode .hamburger {
+            color: #e0e0e0;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 250px;
+            height: 100%;
+            background: #fff;
+            z-index: 2000;
+            transition: right 0.3s ease;
+            padding: 20px;
+        }
+
+        body.dark-mode .mobile-menu {
+            background: #2c2c2c;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu .close-menu {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        body.dark-mode .mobile-menu .close-menu {
+            color: #e0e0e0;
+        }
+
+        .mobile-menu ul {
+            list-style: none;
+            margin-top: 60px;
+        }
+
+        .mobile-menu ul li {
+            margin: 20px 0;
+        }
+
+        .mobile-menu ul li a {
+            text-decoration: none;
+            color: #333;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.2rem;
+        }
+
+        body.dark-mode .mobile-menu ul li a {
+            color: #e0e0e0;
+        }
+
+        .mobile-menu ul li a.login-btn {
+            background: #d32f2f;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 25px;
+        }
+
+        .mobile-menu .language-toggle {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mobile-menu .lang-btn {
+            background: #d32f2f;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .mobile-menu .lang-btn:hover {
+            background: #b71c1c;
+        }
+
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .hero-content {
+            color: #fff;
+            z-index: 1;
+            animation: heroFadeIn 2s ease-out;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .hero-content h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: #fff;
+            animation: underlineExpand 2s ease-in-out infinite;
+        }
+
+        .hero-content p {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .hero-content .cta-button {
+            background: #d32f2f;
+            color: #fff;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 30px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            transition: background 0.3s ease, transform 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .hero-content .cta-button:hover {
+            background: #b71c1c;
+            transform: translateY(-3px);
+        }
+
+        .about {
+            padding: 100px 0;
+            background: #fff;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        body.dark-mode .about {
+            background: #2c2c2c;
+        }
+
+        .about.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .about h2 {
+            font-size: 3rem;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #d32f2f;
+            position: relative;
+        }
+
+        .about h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: #d32f2f;
+        }
+
+        .about p {
+            font-size: 1.3rem;
+            line-height: 1.9;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto 40px;
+            color: #666;
+        }
+
+        body.dark-mode .about p {
+            color: #b0b0b0;
+        }
+
+        .about-stats {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+        }
+
+        .about-stats .stat {
+            text-align: center;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease-out;
+        }
+
+        .about-stats .stat.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .about-stats .stat::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: url('assets/heart-icon.png') no-repeat center;
+            background-size: contain;
+            opacity: 0.7;
+            transition: transform 0.3s ease;
+        }
+
+        .about-stats .stat:hover::before {
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        .about-stats .stat h3 {
+            font-size: 2.5rem;
+            font-family: 'Roboto', sans-serif;
+            color: #d32f2f;
+        }
+
+        .about-stats .stat p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        body.dark-mode .about-stats .stat p {
+            color: #b0b0b0;
+        }
+
+        .services {
+            padding: 100px 0;
+            background: #f5f7fa;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        body.dark-mode .services {
+            background: #222222;
+        }
+
+        .services.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .services h2 {
+            font-size: 3rem;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #d32f2f;
+            position: relative;
+        }
+
+        .services h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: #d32f2f;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .service-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transform-style: preserve-3d;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        body.dark-mode .service-card {
+            background: #2c2c2c;
+        }
+
+        .service-card.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-icon {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 15px;
+        }
+
+        .service-card h3 {
+            font-size: 1.8rem;
+            font-family: 'Roboto', sans-serif;
+            margin-bottom: 15px;
+            color: #d32f2f;
+        }
+
+        .service-card p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        body.dark-mode .service-card p {
+            color: #b0b0b0;
+        }
+
+        footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 30px 0;
+            animation: footerSlideIn 1.5s ease-out;
+        }
+
+        body.dark-mode footer {
+            background: #1a1a1a;
+        }
+
+        .social-links {
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            color: #fff;
+            margin: 0 10px;
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #d32f2f;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #d32f2f;
+            color: #fff;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: #b71c1c;
+            transform: scale(1.1);
+        }
+
+        @keyframes headerSlideIn {
+            0% { transform: translateY(-50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes logoPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1.05); }
+        }
+
+        @keyframes heroFadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes underlineExpand {
+            0% { width: 0; }
+            50% { width: 150px; }
+            100% { width: 0; }
+        }
+
+        @keyframes footerSlideIn {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(211, 47, 47, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content p {
+                font-size: 1.2rem;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .about-stats {
+                flex-direction: column;
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Video -->
+    <video autoplay muted loop class="background-video">
+        <source src="1.mp4" type="video/mp4">
+    </video>
+    <div class="background-overlay"></div>
+
+    <!-- Navigation -->
+    <header class="header">
+        <div class="container">
+            <vide src="66.mp4" class="logo">
+            <nav class="desktop-nav">
+            </nav>
+            <button class="hamburger"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <button class="close-menu"><i class="fas fa-times"></i></button>
+        <ul>
+            <li><a href="#home" class="nav-link" data-key="home">الرئيسية</a></li>
+            <li><a href="#about" class="nav-link" data-key="about">عن المستشفى</a></li>
+            <li><a href="#services" class="nav-link" data-key="services">الخدمات</a></li>
+            <li><a href="index_login.html" class="nav-link login-btn" data-key="login">تسجيل الدخول</a></li>
+            <li class="language-toggle">
+                <li><a href="index_or.html" class="nav-link login-btn" >احجز الان</a></li>
+                <button class="lang-btn" data-lang="ar">العربية</button>
+                <button class="lang-btn" data-lang="en">English</button>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 data-key="hero-title"> مجال الصحة</h1>
+            <p data-key="hero-subtitle">رعاية صحية بمعايير عالمية</p>
+            <a href="#services" class="cta-button" data-key="hero-cta">اكتشف خدماتنا</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 data-key="about-title">عن مستشفى هنا</h2>
+            <p data-key="about-text">مستشفى هنا تقدم رعاية صحية متكاملة بأعلى المعايير العالمية. مع فريق من الأطباء المتخصصين وأحدث التقنيات، نحن هنا لضمان سلامتك وراحتك.</p>
+            <div class="about-stats">
+                <div class="stat">
+                    <h3 data-key="stat-doctors">500</h3>
+                    <p data-key="stat-doctors-text">طبيب متخصص</p>
+                </div>
+                <div class="stat">
+                    <h3 data-key="stat-patients">10000</h3>
+                    <p data-key="stat-patients-text">مريض سنويًا</p>
+                </div>
+                <div class="stat">
+                    <h3 data-key="stat-emergency">24/7</h3>
+                    <p data-key="stat-emergency-text">خدمة طوارئ</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 data-key="services-title">خدماتنا</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <img src="assets/heart-icon.png" alt="أيقونة القلب" class="service-icon">
+                    <h3 data-key="service-cardiology">القلب</h3>
+                    <p data-key="service-cardiology-text">علاج أمراض القلب بأحدث التقنيات.</p>
+                </div>
+                <div class="service-card">
+                    <img src="assets/heart-icon.png" alt="أيقونة الجراحة" class="service-icon">
+                    <h3 data-key="service-surgery">الجراحة</h3>
+                    <p data-key="service-surgery-text">عمليات دقيقة بأيدي جراحين متميزين.</p>
+                </div>
+                <div class="service-card">
+                    <img src="assets/heart-icon.png" alt="أيقونة الطوارئ" class="service-icon">
+                    <h3 data-key="service-emergency">الطوارئ</h3>
+                    <p data-key="service-emergency-text">رعاية فورية على مدار الساعة.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p data-key="footer-text">© 2025 مستشفى هنا. جميع الحقوق محفوظة.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle"><i class="fas fa-moon"></i></button>
+
+    <!-- JavaScript (مدخل مع الـ HTML مباشرة) -->
+    <script>
+        // Theme Toggle
+        const themeToggle = document.querySelector('.theme-toggle');
+        const body = document.body;
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDarkMode = body.classList.contains('dark-mode');
+            themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        });
+
+        // تحميل الوضع المحفوظ
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode'); 
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+
+        // بيانات اللغة
+        const translations = {
+            ar: {
+                'home': 'الرئيسية',
+                'about': 'عن المستشفى',
+                'services': 'الخدمات',
+                'login': 'تسجيل الدخول',
+                'hero-title':'مجال الصحة',
+                'hero-subtitle': 'رعاية صحية بمعايير عالمية',
+                'hero-cta': 'اكتشف خدماتنا',
+                'about-title': 'عن مجال الصحة',
+                'about-text':  'مجال الصحة تقدم رعاية صحية متكاملة بأعلى المعايير العالمية. مع فريق من الأطباء المتخصصين وأحدث التقنيات، نحن هنا لضمان سلامتك وراحت',
+                'stat-doctors': '500',
+                'stat-doctors-text': 'طبيب متخصص',
+                'stat-patients': '10000',
+                'stat-patients-text': 'مريض سنويًا',
+                'stat-emergency': '24/7',
+                'stat-emergency-text': 'خدمة طوارئ',
+                'services-title': 'خدماتنا',
+                'service-cardiology': 'القلب',
+                'service-cardiology-text': 'علاج أمراض القلب بأحدث التقنيات.',
+                'service-surgery': 'الجراحة',
+                'service-surgery-text': 'عمليات دقيقة بأيدي جراحين متميزين.',
+                'service-emergency': 'الطوارئ',
+                'service-emergency-text': 'رعاية فورية على مدار الساعة.',
+                'footer-text': '© 2025 مستشفى هنا. جميع الحقوق محفوظة.'
+            },
+            en: {
+                'home': 'Home',
+                'about': 'About Us',
+                'services': 'Services',
+                'login': 'Login',
+                'hero-title': 'healthsphere',
+                'hero-subtitle': 'World-Class Healthcare',
+                'hero-cta': 'Explore Our Services',
+                'about-title': 'About healthsphere',
+                'about-text': 'Hana Hospital provides comprehensive healthcare with the highest global standards. With a team of specialized doctors and cutting-edge technology, we ensure your safety and comfort.',
+                'stat-doctors': '500',
+                'stat-doctors-text': 'Specialized Doctors',
+                'stat-patients': '10000',
+                'stat-patients-text': 'Patients Annually',
+                'stat-emergency': '24/7',
+                'stat-emergency-text': 'Emergency Services',
+                'services-title': 'Our Services',
+                'service-cardiology': 'Cardiology',
+                'service-cardiology-text': 'Treating heart conditions with the latest technology.',
+                'service-surgery': 'Surgery',
+                'service-surgery-text': 'Precise operations by distinguished surgeons.',
+                'service-emergency': 'Emergency',
+                'service-emergency-text': 'Immediate care around the clock.',
+                'footer-text': '© 2025 Hana Hospital. All rights reserved.'
+            }
+        };
+
+        // تبديل اللغة
+        const langButtons = document.querySelectorAll('.lang-btn');
+        let currentLang = 'ar';
+
+        function updateContent(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-key]').forEach(element => {
+                const key = element.getAttribute('data-key');
+                element.textContent = translations[lang][key];
+            });
+            document.documentElement.setAttribute('lang', lang);
+            document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            document.body.style.direction = lang === 'ar' ? 'rtl' : 'ltr';
+            localStorage.setItem('language', lang);
+        }
+
+        langButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const lang = button.getAttribute('data-lang');
+                updateContent(lang);
+                closeMobileMenu();
+            });
+        });
+
+        // تحميل اللغة المحفوظة
+        const savedLang = localStorage.getItem('language') || 'ar';
+        updateContent(savedLang);
+
+        // قائمة الهامبرغر
+        const hamburger = document.querySelector('.hamburger');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const closeMenu = document.querySelector('.close-menu');
+
+        hamburger.addEventListener('click', () => {
+            mobileMenu.classList.add('active');
+        });
+
+        closeMenu.addEventListener('click', closeMobileMenu);
+
+        function closeMobileMenu() {
+            mobileMenu.classList.remove('active');
+        }
+
+        // التنقل السلس
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (!this.classList.contains('login-btn')) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    window.scrollTo({
+                        top: targetSection.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                    closeMobileMenu();
+                }
+            });
+        });
+
+        // الرسوم المتحركة عند التمرير (من الكود بتاعك)
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.about, .services, .service-card');
+            elements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight * 0.8) {
+                    el.classList.add('animate');
+                    if (el.classList.contains('about')) {
+                        const stats = el.querySelectorAll('.stat');
+                        stats.forEach((stat, index) => {
+                            setTimeout(() => {
+                                stat.classList.add('animate');
+                            }, index * 200);
+                        });
+                    }
+                }
+            });
+        };
+
+        window.addEventListener('scroll', animateOnScroll);
+        animateOnScroll();
+
+     
+    </script>
+</body>
+</html>

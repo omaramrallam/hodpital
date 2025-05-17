@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #900C3F;
+            --secondary-color: #C70039;
+            --text-color: #333;
+            --bg-color: #f5f6fa;
+            --card-bg: #fff;
+            --button-text: #fff;
+            --input-bg: #f1f1f1;
+            --input-border: #ddd;
+            --link-color: #900C3F;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+        }
+
+        .dark-mode {
+            --primary-color: #900C3F;
+            --secondary-color: #581845;
+            --text-color: #f1f1f1;
+            --bg-color: #1e272e;
+            --card-bg: #2d3436;
+            --button-text: #fff;
+            --input-bg: #353b48;
+            --input-border: #485460;
+            --link-color: #FF5733;
+            --error-color: #ff6b6b;
+            --success-color: #5ecc62;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: row;
+            position: relative;
+        }
+
+        .signin-section {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .welcome-section {
+            flex: 1;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .social-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--input-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .social-button:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder,
+        input[type="text"]::placeholder {
+            color: #888;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .forgot-password a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: var(--button-text);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .welcome-section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .welcome-section p {
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .settings-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .settings-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: var(--text-color);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .signup-section,
+        .forgot-section {
+            display: none;
+        }
+
+        .back-to-login {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-to-login a {
+            color: var(--link-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: center;
+            display: none;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #888;
+            width: auto;
+            padding: 0;
+        }
+
+        html[dir="rtl"] .settings-buttons {
+            right: auto;
+            left: 20px;
+        }
+
+        html[dir="rtl"] .password-toggle {
+            right: auto;
+            left: 10px;
+        }
+
+        html[dir="ltr"] .container {
+            flex-direction: row-reverse;
+        }
+
+        html[dir="ltr"] .password-toggle {
+            right: 10px;
+            left: auto;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255, Gda255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .fullscreen-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+
+        .fullscreen-loader .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            html[dir="ltr"] .container {
+                flex-direction: column;
+            }
+            
+            .welcome-section {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-buttons">
+        <button class="settings-button" id="themeToggle" title="تبديل المظهر">🌓</button>
+        <button class="settings-button" id="langToggle" title="تغيير اللغة">🌐</button>
+    </div>
+
+    <div class="fullscreen-loader">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container">
+        <!-- تسجيل الدخول -->
+        <div class="signin-section" id="loginSection">
+            <h1 class="lang-signin">تسجيل الدخول</h1>
+            
+            <div class="social-buttons">
+                <div class="social-button" id="googleLogin" title="Google">G</div>
+                <div class="social-button" id="facebookLogin" title="Facebook">f</div>
+                <div class="social-button" id="githubLogin" title="GitHub">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                </div>
+                <div class="social-button" id="linkedinLogin" title="LinkedIn">in</div>
+            </div>
+            
+            <div class="divider lang-or">أو استخدم بريدك الإلكتروني وكلمة المرور</div>
+             <li><a href="index_essential.html" class="nav-link login-btn" >احجز الان</a></li>
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
+                    <div class="error-message" id="loginEmailError"></div>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
+                    <button type="button" class="password-toggle" id="loginPasswordToggle">👁</button>
+                    <div class="error-message" id="loginPasswordError"></div>
+                </div>
+                
+                <div class="forgot-password">
+                    <a href="#" id="forgotPasswordLink" class="lang-forgot">نسيت كلمة المرور؟</a>
+                </div>
+                
+                <button type="submit" class="lang-signin-btn">
+                    <span>تسجيل الدخول</span>
+                    <span class="loading" id="loginLoading"></span>
+                </button>
+                <div class="error-message" id="loginGeneralError"></div>
+                <div class="success-message" id="loginSuccess"></div>
+            </form>
+        </div>
+        
+        <!-- إنشاء حساب -->
+        <div class="signin-section signup-section" id="signupSection">
+            <h1 class="lang-signup">إنشاء حساب</h1>
+            
+            <div class="social-buttons">
+                <div class="social-button" id="googleSignup" title="Google">G</div>
+                <div class="social-button" id="facebookSignup" title="Facebook">f</div>
+                <div class="social-button" id="githubSignup" title="GitHub">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                </div>
+                <div class="social-button" id="linkedinSignup" title="LinkedIn">in</div>
+            </div>
+            
+            <div class="divider lang-or-signup">أو أنشئ حسابك بالبريد الإلكتروني</div>
+            
+            <form id="signupForm">
+                <div class="form-group">
+                    <input type="text" id="signupName" placeholder="الاسم الكامل" required>
+                    <div class="error-message" id="signupNameError"></div>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="signupEmail" placeholder="البريد الإلكتروني" required>
+                    <div class="error-message" id="signupEmailError"></div>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signupPassword" placeholder="كلمة المرور" required>
+                    <button type="button" class="password-toggle" id="signupPasswordToggle">👁</button>
+                    <div class="error-message" id="signupPasswordError"></div>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signupConfirmPassword" placeholder="تأكيد كلمة المرور" required>
+                    <button type="button" class="password-toggle" id="signupConfirmPasswordToggle">👁</button>
+                    <div class="error-message" id="signupConfirmPasswordError"></div>
+                </div>
+                
+                <button type="submit" class="lang-signup-btn-submit">
+                    <span>إنشاء حساب</span>
+                    <span class="loading" id="signupLoading"></span>
+                </button>
+                <div class="error-message" id="signupGeneralError"></div>
+                <div class="success-message" id="signupSuccess"></div>
+                
+                <div class="back-to-login">
+                    <a href="#" id="backToLoginFromSignup" class="lang-back-to-login">لديك حساب بالفعل؟ تسجيل الدخول</a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- نسيت كلمة المرور -->
+        <div class="signin-section forgot-section" id="forgotSection">
+            <h1 class="lang-forgot-password-title">استعادة كلمة المرور</h1>
+            
+            <p class="lang-forgot-password-desc" style="text-align: center; margin-bottom: 30px; color: var(--text-color);">
+                أدخل بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور
+            </p>
+            
+            <form id="forgotForm">
+                <div class="form-group">
+                    <input type="email" id="forgotEmail" placeholder="البريد الإلكتروني" required>
+                    <div class="error-message" id="forgotEmailError"></div>
+                </div>
+                
+                <button type="submit" class="lang-forgot-password-btn">
+                    <span>إرسال رابط الاستعادة</span>
+                    <span class="loading" id="forgotLoading"></span>
+                </button>
+                <div class="error-message" id="forgotGeneralError"></div>
+                <div class="success-message" id="forgotSuccess"></div>
+                
+                <div class="back-to-login">
+                    <a href="#" id="backToLoginFromForgot" class="lang-back-to-login">العودة لتسجيل الدخول</a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="welcome-section">
+            <h2 class="lang-welcome">مرحباً، صديقي!</h2>
+            <p class="lang-register-text">سجل بياناتك الشخصية لاستخدام جميع ميزات الموقع</p>
+            <button class="lang-signup-btn" id="goToSignupBtn">إنشاء حساب</button>
+        </div>
+    </div>
+
+    <script>
+        // تهيئة Firebase (استبدل القيم بإعدادات مشروعك من Firebase Console)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // اللغات المتاحة
+        const languages = {
+            ar: {
+                dir: 'rtl',
+                signin: 'تسجيل الدخول',
+                or: 'أو استخدم بريدك الإلكتروني وكلمة المرور',
+                'or-signup': 'أو أنشئ حسابك بالبريد الإلكتروني',
+                email: 'البريد الإلكتروني',
+                password: 'كلمة المرور',
+                name: 'الاسم الكامل',
+                confirmPassword: 'تأكيد كلمة المرور',
+                forgot: 'نسيت كلمة المرور؟',
+                signinBtn: 'تسجيل الدخول',
+                welcome: 'مرحباً، صديقي!',
+                registerText: 'سجل بياناتك الشخصية لاستخدام جميع ميزات الموقع',
+                signupBtn: 'إنشاء حساب',
+                signup: 'إنشاء حساب',
+                'signup-btn-submit': 'إنشاء حساب',
+                themeToggle: 'تبديل المظهر',
+                langToggle: 'تغيير اللغة',
+                'back-to-login': 'لديك حساب بالفعل؟ تسجيل الدخول',
+                'forgot-password-title': 'استعادة كلمة المرور',
+                'forgot-password-desc': 'أدخل بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور',
+                'forgot-password-btn': 'إرسال رابط الاستعادة',
+                'validation-required': 'هذا الحقل مطلوب',
+                'validation-email': 'يرجى إدخال بريد إلكتروني صحيح',
+                'validation-password': 'كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل',
+                'validation-password-match': 'كلمات المرور غير متطابقة',
+                'login-success': 'تم تسجيل الدخول بنجاح!',
+                'signup-success': 'تم إنشاء الحساب بنجاح!',
+                'forgot-success': 'تم إرسال رابط استعادة كلمة المرور بنجاح!',
+                'error-invalid-credentials': 'بريد إلكتروني أو كلمة مرور غير صحيحة',
+                'error-email-exists': 'البريد الإلكتروني مستخدم بالفعل',
+                'error-email-not-found': 'البريد الإلكتروني غير مسجل',
+                'error-network': 'حدث خطأ في الاتصال، يرجى المحاولة مرة أخرى'
+            },
+            en: {
+                dir: 'ltr',
+                signin: 'Sign In',
+                or: 'or use your email and password',
+                'or-signup': 'or create your account with email',
+                email: 'Email',
+                password: 'Password',
+                name: 'Full Name',
+                confirmPassword: 'Confirm Password',
+                forgot: 'Forgot Your Password?',
+                signinBtn: 'SIGN IN',
+                welcome: 'Hello, Friend!',
+                registerText: 'Register with your personal details to use all site features',
+                signupBtn: 'SIGN UP',
+                signup: 'Sign Up',
+                'signup-btn-submit': 'SIGN UP',
+                themeToggle: 'Toggle Theme',
+                langToggle: 'Change Language',
+                'back-to-login': 'Already have an account? Sign In',
+                'forgot-password-title': 'Password Recovery',
+                'forgot-password-desc': 'Enter your email and we\'ll send you a link to reset your password',
+                'forgot-password-btn': 'SEND RECOVERY LINK',
+                'validation-required': 'This field is required',
+                'validation-email': 'Please enter a valid email',
+                'validation-password': 'Password must be at least 8 characters',
+                'validation-password-match': 'Passwords do not match',
+                'login-success': 'Login successful!',
+                'signup-success': 'Account created successfully!',
+                'forgot-success': 'Password recovery link sent successfully!',
+                'error-invalid-credentials': 'Invalid email or password',
+                'error-email-exists': 'Email is already in use',
+                'error-email-not-found': 'Email is not registered',
+                'error-network': 'Network error, please try again'
+            }
+        };
+
+        // العناصر DOM
+        const htmlElement = document.documentElement;
+        const loginSection = document.getElementById('loginSection');
+        const signupSection = document.getElementById('signupSection');
+        const forgotSection = document.getElementById('forgotSection');
+        const goToSignupBtn = document.getElementById('goToSignupBtn');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const backToLoginFromSignup = document.getElementById('backToLoginFromSignup');
+        const backToLoginFromForgot = document.getElementById('backToLoginFromForgot');
+        const themeToggle = document.getElementById('themeToggle');
+        const langToggle = document.getElementById('langToggle');
+        const fullscreenLoader = document.querySelector('.fullscreen-loader');
+
+        // نماذج
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const forgotForm = document.getElementById('forgotForm');
+
+        // حقول الإدخال
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        const signupName = document.getElementById('signupName');
+        const signupEmail = document.getElementById('signupEmail');
+        const signupPassword = document.getElementById('signupPassword');
+        const signupConfirmPassword = document.getElementById('signupConfirmPassword');
+        const forgotEmail = document.getElementById('forgotEmail');
+
+        // أزرار إظهار/إخفاء كلمة المرور
+        const loginPasswordToggle = document.getElementById('loginPasswordToggle');
+        const signupPasswordToggle = document.getElementById('signupPasswordToggle');
+        const signupConfirmPasswordToggle = document.getElementById('signupConfirmPasswordToggle');
+
+        // رسائل الخطأ والنجاح
+        const loginEmailError = document.getElementById('loginEmailError');
+        const loginPasswordError = document.getElementById('loginPasswordError');
+        const loginGeneralError = document.getElementById('loginGeneralError');
+        const loginSuccess = document.getElementById('loginSuccess');
+        const signupNameError = document.getElementById('signupNameError');
+        const signupEmailError = document.getElementById('signupEmailError');
+        const signupPasswordError = document.getElementById('signupPasswordError');
+        const signupConfirmPasswordError = document.getElementById('signupConfirmPasswordError');
+        const signupGeneralError = document.getElementById('signupGeneralError');
+        const signupSuccess = document.getElementById('signupSuccess');
+        const forgotEmailError = document.getElementById('forgotEmailError');
+        const forgotGeneralError = document.getElementById('forgotGeneralError');
+        const forgotSuccess = document.getElementById('forgotSuccess');
+
+        // أيقونات التحميل
+        const loginLoading = document.getElementById('loginLoading');
+        const signupLoading = document.getElementById('signupLoading');
+        const forgotLoading = document.getElementById('forgotLoading');
+
+        // أزرار تسجيل الدخول بالشبكات الاجتماعية
+        const socialButtons = {
+            googleLogin: document.getElementById('googleLogin'),
+            facebookLogin: document.getElementById('facebookLogin'),
+            githubLogin: document.getElementById('githubLogin'),
+            linkedinLogin: document.getElementById('linkedinLogin'),
+            googleSignup: document.getElementById('googleSignup'),
+            facebookSignup: document.getElementById('facebookSignup'),
+            githubSignup: document.getElementById('githubSignup'),
+            linkedinSignup: document.getElementById('linkedinSignup')
+        };
+
+        // تحميل الإعدادات المحفوظة
+        const savedLang = localStorage.getItem('language') || 'ar';
+        const savedTheme = localStorage.getItem('darkMode') === 'true';
+        switchLanguage(savedLang);
+        if (savedTheme) document.body.classList.add('dark-mode');
+
+        // التنقل بين الصفحات
+        function showSection(sectionId) {
+            loginSection.style.display = 'none';
+            signupSection.style.display = 'none';
+            forgotSection.style.display = 'none';
+            document.getElementById(sectionId).style.display = 'block';
+            document.querySelectorAll('.error-message, .success-message').forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+        }
+
+        // تبديل المظهر
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        });
+
+        // تبديل اللغة
+        function switchLanguage(lang) {
+            htmlElement.setAttribute('lang', lang);
+            htmlElement.setAttribute('dir', languages[lang].dir);
+            document.querySelectorAll('[class*="lang-"]').forEach(el => {
+                const key = el.className.split(' ').find(cls => cls.startsWith('lang-')).replace('lang-', '');
+                el.textContent = languages[lang][key];
+            });
+            document.querySelectorAll('input[placeholder]').forEach(input => {
+                const key = input.id.replace(/^(login|signup|forgot)/, '').toLowerCase();
+                input.placeholder = languages[lang][key] || input.placeholder;
+            });
+        }
+
+        langToggle.addEventListener('click', () => {
+            const currentLang = htmlElement.getAttribute('lang');
+            const newLang = currentLang === 'ar' ? 'en' : 'ar';
+            switchLanguage(newLang);
+            localStorage.setItem('language', newLang);
+        });
+
+        // تبديل عرض/إخفاء كلمة المرور
+        function setupPasswordToggle(inputId, toggleId) {
+            const input = document.getElementById(inputId);
+            const toggle = document.getElementById(toggleId);
+            toggle.addEventListener('click', () => {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    toggle.textContent = '🔒';
+                } else {
+                    input.type = 'password';
+                    toggle.textContent = '👁';
+                }
+            });
+        }
+
+        setupPasswordToggle('loginPassword', 'loginPasswordToggle');
+        setupPasswordToggle('signupPassword', 'signupPasswordToggle');
+        setupPasswordToggle('signupConfirmPassword', 'signupConfirmPasswordToggle');
+
+        // التحقق من صحة البريد الإلكتروني
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // تسجيل الدخول عبر البريد الإلكتروني
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginEmailError.style.display = 'none';
+            loginPasswordError.style.display = 'none';
+            loginGeneralError.style.display = 'none';
+            loginSuccess.style.display = 'none';
+
+            const email = loginEmail.value.trim();
+            const password = loginPassword.value.trim();
+            const lang = htmlElement.getAttribute('lang');
+
+            if (!email) {
+                loginEmailError.textContent = languages[lang]['validation-required'];
+                loginEmailError.style.display = 'block';
+                return;
+            }
+            if (!validateEmail(email)) {
+                loginEmailError.textContent = languages[lang]['validation-email'];
+                loginEmailError.style.display = 'block';
+                return;
+            }
+            if (!password) {
+                loginPasswordError.textContent = languages[lang]['validation-required'];
+                loginPasswordError.style.display = 'block';
+                return;
+            }
+
+            loginLoading.style.display = 'inline-block';
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                loginSuccess.textContent = languages[lang]['login-success'];
+                loginSuccess.style.display = 'block';
+                setTimeout(() => window.location.href = '/dashboard', 1000);
+            } catch (error) {
+                loginLoading.style.display = 'none';
+                let errorMessage = languages[lang]['error-network'];
+                if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                    errorMessage = languages[lang]['error-invalid-credentials'];
+                }
+                loginGeneralError.textContent = errorMessage;
+                loginGeneralError.style.display = 'block';
+            }
+        });
+
+        // إنشاء حساب جديد
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            signupNameError.style.display = 'none';
+            signupEmailError.style.display = 'none';
+            signupPasswordError.style.display = 'none';
+            signupConfirmPasswordError.style.display = 'none';
+            signupGeneralError.style.display = 'none';
+            signupSuccess.style.display = 'none';
+
+            const name = signupName.value.trim();
+            const email = signupEmail.value.trim();
+            const password = signupPassword.value.trim();
+            const confirmPassword = signupConfirmPassword.value.trim();
+            const lang = htmlElement.getAttribute('lang');
+
+            if (!name) {
+                signupNameError.textContent = languages[lang]['validation-required'];
+                signupNameError.style.display = 'block';
+                return;
+            }
+            if (!email) {
+                signupEmailError.textContent = languages[lang]['validation-required'];
+                signupEmailError.style.display = 'block';
+                return;
+            }
+            if (!validateEmail(email)) {
+                signupEmailError.textContent = languages[lang]['validation-email'];
+                signupEmailError.style.display = 'block';
+                return;
+            }
+            if (!password) {
+                signupPasswordError.textContent = languages[lang]['validation-required'];
+                signupPasswordError.style.display = 'block';
+                return;
+            }
+            if (password.length < 8) {
+                signupPasswordError.textContent = languages[lang]['validation-password'];
+                signupPasswordError.style.display = 'block';
+                return;
+            }
+            if (!confirmPassword) {
+                signupConfirmPasswordError.textContent = languages[lang]['validation-required'];
+                signupConfirmPasswordError.style.display = 'block';
+                return;
+            }
+            if (password !== confirmPassword) {
+                signupConfirmPasswordError.textContent = languages[lang]['validation-password-match'];
+                signupConfirmPasswordError.style.display = 'block';
+                return;
+            }
+
+            signupLoading.style.display = 'inline-block';
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await userCredential.user.updateProfile({ displayName: name });
+                signupSuccess.textContent = languages[lang]['signup-success'];
+                signupSuccess.style.display = 'block';
+                setTimeout(() => window.location.href = '/dashboard', 1000);
+            } catch (error) {
+                signupLoading.style.display = 'none';
+                let errorMessage = languages[lang]['error-network'];
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = languages[lang]['error-email-exists'];
+                }
+                signupGeneralError.textContent = errorMessage;
+                signupGeneralError.style.display = 'block';
+            }
+        });
+
+        // إعادة تعيين كلمة المرور
+        forgotForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            forgotEmailError.style.display = 'none';
+            forgotGeneralError.style.display = 'none';
+            forgotSuccess.style.display = 'none';
+
+            const email = forgotEmail.value.trim();
+            const lang = htmlElement.getAttribute('lang');
+
+            if (!email) {
+                forgotEmailError.textContent = languages[lang]['validation-required'];
+                forgotEmailError.style.display = 'block';
+                return;
+            }
+            if (!validateEmail(email)) {
+                forgotEmailError.textContent = languages[lang]['validation-email'];
+                forgotEmailError.style.display = 'block';
+                return;
+            }
+
+            forgotLoading.style.display = 'inline-block';
+            try {
+                await auth.sendPasswordResetEmail(email);
+                forgotSuccess.textContent = languages[lang]['forgot-success'];
+                forgotSuccess.style.display = 'block';
+                forgotLoading.style.display = 'none';
+            } catch (error) {
+                forgotLoading.style.display = 'none';
+                let errorMessage = languages[lang]['error-network'];
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = languages[lang]['error-email-not-found'];
+                }
+                forgotGeneralError.textContent = errorMessage;
+                forgotGeneralError.style.display = 'block';
+            }
+        });
+
+        // تسجيل الدخول عبر الشبكات الاجتماعية
+        async function socialLogin(provider) {
+            fullscreenLoader.style.display = 'flex';
+            try {
+                await auth.signInWithPopup(provider);
+                loginSuccess.textContent = languages[htmlElement.getAttribute('lang')]['login-success'];
+                loginSuccess.style.display = 'block';
+                setTimeout(() => window.location.href = '/dashboard', 1000);
+            } catch (error) {
+                fullscreenLoader.style.display = 'none';
+                const lang = htmlElement.getAttribute('lang');
+                let errorMessage = languages[lang]['error-network'];
+                if (error.code === 'auth/account-exists-with-different-credential') {
+                    errorMessage = languages[lang]['error-email-exists'];
+                }
+                loginGeneralError.textContent = errorMessage;
+                loginGeneralError.style.display = 'block';
+            }
+        }
+
+        // إعداد مزودي الشبكات الاجتماعية
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+        const facebookProvider = new firebase.auth.FacebookAuthProvider();
+        const githubProvider = new firebase.auth.GithubAuthProvider();
+
+        // تسجيل الدخول عبر Google
+        socialButtons.googleLogin.addEventListener('click', () => socialLogin(googleProvider));
+        socialButtons.googleSignup.addEventListener('click', () => socialLogin(googleProvider));
+
+        // تسجيل الدخول عبر Facebook
+        socialButtons.facebookLogin.addEventListener('click', () => socialLogin(facebookProvider));
+        socialButtons.facebookSignup.addEventListener('click', () => socialLogin(facebookProvider));
+
+        // تسجيل الدخول عبر GitHub
+        socialButtons.githubLogin.addEventListener('click', () => socialLogin(githubProvider));
+        socialButtons.githubSignup.addEventListener('click', () => socialLogin(githubProvider));
+
+        // تسجيل الدخول عبر LinkedIn (توجيه إلى صفحة تسجيل الدخول)
+        socialButtons.linkedinLogin.addEventListener('click', () => {
+            window.location.href = 'https://www.linkedin.com/login';
+        });
+        socialButtons.linkedinSignup.addEventListener('click', () => {
+            window.location.href = 'https://www.linkedin.com/signup';
+        });
+
+        // التنقل بين الصفحات
+        goToSignupBtn.addEventListener('click', () => showSection('signupSection'));
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('forgotSection');
+        });
+        backToLoginFromSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('loginSection');
+        });
+        backToLoginFromForgot.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('loginSection');
+        });
+    </script>
+</body>
+</html>
