@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة الطبيب - استقبال المكالمات</title>
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">منصة الطبيب</h1>
+    <div class="mb-4">
+      <label for="doctor-id" class="block text-gray-700 font-medium mb-2">معرف الطبيب</label>
+      <input type="text" id="doctor-id" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="أدخل معرفك">
+      <button id="register-button" class="mt-2 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">تسجيل المعرف</button>
+    </div>
+    <div id="call-notification" class="hidden bg-yellow-100 p-4 rounded-lg mb-4">
+      <p class="text-yellow-800">مكالمة واردة من المريض</p>
+      <button id="accept-call" class="mt-2 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">قبول المكالمة</button>
+    </div>
+    <div>
+      <video id="local-video" autoplay muted class="w-full h-48 bg-black rounded-lg mb-4"></video>
+      <video id="remote-video" autoplay class="w-full h-48 bg-black rounded-lg"></video>
+    </div>
+  </div>
+
+  <script>
+    let peer;
+    let doctorId;
+
+    document.getElementById('register-button').addEventListener('click', () => {
+      doctorId = document.getElementById('doctor-id').value.trim();
+      if (!doctorId) {
+        alert('يرجى إدخال معرف الطبيب');
+        return;
+      }
+
+      peer = new Peer(`doctor-${doctorId}`, { key: 'peerjs', debug: 2 });
+      peer.on('open', (id) => {
+        console.log('Doctor Peer ID:', id);
+        alert('تم تسجيل معرف الطبيب بنجاح');
+      });
+
+      peer.on('connection', (conn) => {
+        conn.on('data', (data) => {
+          console.log('Received:', data);
+          const notification = document.getElementById('call-notification');
+          notification.classList.remove('hidden');
+        });
+      });
+
+      peer.on('call', (call) => {
+        document.getElementById('accept-call').onclick = () => {
+          navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then((stream) => {
+              const localVideo = document.getElementById('local-video');
+              localVideo.srcObject = stream;
+              call.answer(stream);
+              call.on('stream', (remoteStream) => {
+                const remoteVideo = document.getElementById('remote-video');
+                remoteVideo.srcObject = remoteStream;
+              });
+              document.getElementById('call-notification').classList.add('hidden');
+            })
+            .catch((err) => {
+              console.error('Error accessing media devices:', err);
+              alert('خطأ في الوصول إلى الكاميرا أو الميكروفون');
+            });
+        };
+      });
+
+      peer.on('error', (err) => {
+        console.error('PeerJS error:', err);
+        alert('حدث خطأ في الاتصال');
+      });
+    });
+  </script>
+</body>
+</html>
